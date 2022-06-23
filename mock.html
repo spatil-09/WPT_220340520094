@@ -1,0 +1,144 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+	<meta charset="UTF-8">
+	<meta http-equiv="X-UA-Compatible" content="IE=edge">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<title>Books</title>
+	<script src="https://code.jquery.com/jquery-3.6.0.js"
+		integrity="sha256-H+K7U5CnXl1h5ywQfKtSj8PCmoN9aaq30gDh27Xc0jk=" crossorigin="anonymous"></script>
+	<script>
+
+		$(() => {
+			$("#bid").blur(() => {
+				console.log("blur working");
+				let bookid = $("#bid").val();
+				let ajaxparams = {
+					type: "get",
+					dataType: "json",
+					url: "http://localhost:8081/getbookbyid",
+					data: {
+						Bookid: bookid
+					},
+					success: function (output) {
+						//console.log(output);
+						if (output.bookstatus) {
+							$("#msg").text("book found");
+							$("#bname").val(output.bookdetails.bookname);
+							$("#bprice").val(output.bookdetails.price);
+
+
+						} else {
+							$("#msg").text("book not found");
+							$("#bname").val("");
+							$("#bprice").val("");
+						}
+
+					},
+					error: function (e) {
+						alert('we have trouble ' + JSON.stringify(e));
+					}
+				};//end of ajax parameter object
+
+
+				$.ajax(ajaxparams);
+
+
+			});//blur end here
+
+			$("#update").click(() => {
+				console.log("update btn working");
+				let input = { Bookid: $("#bid").val(), Bookname: $("#bname").val(), Price: $("#bprice").val() };
+
+				let ajaxparams = {
+					type: "get",
+					dataType: "json",
+					url: "http://localhost:8081/updatebookbyid",
+					data: input,
+					success: function (output) {
+						//console.log("update successful");
+						//console.log(output);
+						if (output) {
+							$("#msg").text("updated successfully");
+						} else {
+							$("#msg").text(" couldn't update");
+
+						}
+						$("#bname").val("");
+						$("#bprice").val("");
+
+						showbooks();
+
+
+					},
+					error: function (e) {
+						alert('we have trouble ' + JSON.stringify(e));
+					}
+				};//end of ajax parameter object
+
+
+				$.ajax(ajaxparams);
+
+
+			});//update end here
+
+
+
+
+
+			function showbooks() {
+
+				let ajaxparams = {
+					type: "get",
+					dataType: "json",
+					url: "http://localhost:8081/showallbooks",
+					data: {
+
+					},
+					success: function (output) {
+						//console.log(output);
+						 books = output;
+						let content = "";
+						for (let index = 0; index < books.length; index++) {
+							content =content+ "<br/>"+books[index].bookid+" "+books[index].bookname+" "+books[index].price;
+							
+						}
+
+						$("#record").html(content);
+					},
+					error: function (e) {
+						alert('we have trouble ' + JSON.stringify(e));
+					}
+				};//end of ajax parameter object
+
+
+				$.ajax(ajaxparams);
+
+			};//end of showbooks
+
+			showbooks();
+
+
+
+		});//end of dom loaded
+	</script>
+</head>
+
+<body>
+	<br><br>
+	<input type="text" id="bid" placeholder="enter book id">
+	<span id="msg">message area</span>
+	<br>
+	<input type="text" id="bname" placeholder="enter book name">
+	<br>
+	<input type="text" id="bprice" placeholder="book price here">
+	<br><br>
+	<button id="update">update book</button>
+	<hr>
+	<p id="record">all books here</p>
+
+
+</body>
+
+</html>
